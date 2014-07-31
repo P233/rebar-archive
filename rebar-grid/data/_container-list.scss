@@ -1,0 +1,41 @@
+
+$container-keys: map-keys($container);
+$container-length: length($container-keys);
+
+// # Collect the containers which have padding. They will be outputted together with grids.
+$container-padding-list: ();
+
+// # The container-list() function will generate a list of
+// # $selector -> selector name
+// # $nested -> if this container is a wrap of nested girds
+// # $width -> if this contaienr has fixed width
+// # if no value given, the default value is 'false'
+@function container-list($bk) {
+  $container-list: ();
+
+  @for $i from 1 through $container-length {
+    $container-key: nth($container-keys, $i);
+    $container-entry: map-get($container, $container-key);
+    $sub-list: $container-key;
+
+    @if map-has-key($container-entry, nested) and length(map-get($container-entry, nested)) == 1 and map-get($container-entry, nested) {
+      $sub-list: append($sub-list, true);
+    } @else {
+      $sub-list: append($sub-list, false);
+    }
+
+    @if map-has-key($container-entry, padding) and length(map-get($container-entry, padding)) == 1 and map-get($container-entry, padding) {
+      $container-padding-list: append($container-padding-list, unquote($container-key), comma) !global;
+    }
+
+    @if map-has-key($container-entry, width) {
+      $sub-list: append($sub-list, get-value($container-entry, width, $bk));
+    } @else {
+      $sub-list: append($sub-list, false);
+    }
+
+    $container-list: append($container-list, $sub-list, comma);
+  }
+
+  @return $container-list;
+}

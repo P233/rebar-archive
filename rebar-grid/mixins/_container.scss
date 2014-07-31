@@ -1,0 +1,48 @@
+
+@mixin container($bk) {
+  $container-list: container-list($bk);
+  $gutter: nth($gutters, $bk)/2;
+  $selector-list: ();
+
+  // @debug $container-list;
+
+  @each $selector, $nested, $width in $container-list {
+    #{$selector} {
+      @if $bk == 1 {
+        @if $nested {
+          margin-left: -$gutter;
+          margin-right: -$gutter;
+        } @else {
+          margin-left: auto;
+          margin-right: auto;
+
+          @if $width {
+            width: $width;
+          } @else {
+            max-width: $max-width;
+          }
+        }
+
+        $selector-list: append($selector-list, unquote($selector), comma);
+
+      } @else {
+        @if $nested {
+          margin-left: -$gutter;
+          margin-right: -$gutter;
+        } @else if $width {
+          width: $width;
+        }
+      }
+    }
+  }
+
+  @if $bk == 1 {
+    #{$selector-list} {
+      &:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+    }
+  }
+}

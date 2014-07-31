@@ -1,0 +1,10 @@
+
+$max-width: 1170px !default;
+
+$mobile-first: true !default;
+
+$breakpoints: 480px 768px 992px !default;
+
+$gutters: 10px 18px 24px 30px !default;
+
+$media-feature: if($mobile-first, min-width, max-width);

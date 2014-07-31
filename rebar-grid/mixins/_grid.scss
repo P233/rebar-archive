@@ -1,0 +1,49 @@
+
+@mixin grid($bk) {
+  $grid-list: grid-list($bk);
+  $selector-list: ();
+
+  // @debug $grid-list;
+
+  @each $selector, $float, $offset-left, $offset-right, $width, $max-width, $offset-only in $grid-list {
+
+    #{$selector} {
+      @if $bk == 1 and not $offset-only {
+        float: if($float, $float, left);
+
+        @if $max-width {
+          max-width: if(unitless($max-width), percentage($max-width), $max-width);
+        }
+      } @else if $float {
+        float: $float;
+      }
+
+      @if $offset-left {
+        margin-left: if(unitless($offset-left), percentage($offset-left), $offset-left);
+      }
+      @if $offset-right {
+        margin-right: if(unitless($offset-right), percentage($offset-right), $offset-right);
+      }
+
+      @if $width {
+        width: if(unitless($width), percentage($width), $width);
+      }
+    }
+
+    @if not $offset-only {
+      $selector-list: append($selector-list, unquote($selector), comma);
+    }
+  }
+
+  // # Output the selectors which have padding together.
+  @if $container-padding-list != () or $selector-list != () {
+    #{join($container-padding-list, $selector-list, comma)} {
+      $gutter: nth($gutters, $bk)/2;
+      padding-left: $gutter;
+      padding-right: $gutter;
+    }
+
+    // # Reset $container-padding-list at each breakpoint.
+    $container-padding-list: () !global;
+  }
+}

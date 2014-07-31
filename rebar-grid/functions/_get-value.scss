@@ -1,0 +1,4 @@
+
+@function get-value($map, $key, $bk) {
+  @return if(length(map-get($map, $key)) >= $bk, nth(map-get($map, $key), $bk), false);
+}

@@ -1,0 +1,41 @@
+
+$grid-keys: map-keys($grid);
+$grid-length: length($grid-keys);
+
+// # The grid-list() function will generate a list of
+// # $selector -> selector name
+// # $float -> float
+// # $offset-left -> margin-left
+// # $offset-right -> margin-right
+// # $width -> width
+// # $max-width -> max-width
+// # $offset-only -> if this grid only has offset-left, offset-right, or both
+// # if no value given, the default value is 'false'
+@function grid-list($bk) {
+  $grid-list: ();
+
+  @for $i from 1 through $grid-length {
+    $grid-key: nth($grid-keys, $i);
+    $grid-entry: map-get($grid, $grid-key);
+    $sub-list: $grid-key;
+
+    @each $key in (float, offset-left, offset-right, width, max-width) {
+      @if map-has-key($grid-entry, $key) {
+        $sub-list: append($sub-list, get-value($grid-entry, $key, $bk));
+      } @else {
+        $sub-list: append($sub-list, false);
+      }
+    }
+
+    // # If this grid only has offset-left, offset-right, or both.
+    @if not map-has-key($grid-entry, float) and not map-has-key($grid-entry, width) and not map-has-key($grid-entry, max-width) {
+      $sub-list: append($sub-list, true);
+    } @else {
+      $sub-list: append($sub-list, false);
+    }
+
+    $grid-list: append($grid-list, $sub-list, comma);
+  }
+
+  @return $grid-list;
+}
