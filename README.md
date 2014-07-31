@@ -5,6 +5,8 @@ Rebar-Grid is an easy-to-use, flexible, and lightweight grid stystem. It is aime
 
 Current version: 0.1.0
 
+Live demo on SassMeister: [http://sassmeister.com/gist/879b15f69ce08c3d126d](http://sassmeister.com/gist/879b15f69ce08c3d126d)
+
 Rebar-Grid is currently under developing, if you have any feedback please feel free to [open an issue](https://github.com/P233/Rebar-Grid/issues), [send me an email](mailto:hi@peiwen.lu), or [tweet me](https://twitter.com/PeiwenLu), thanks.
 
 
@@ -217,7 +219,7 @@ Length:  a space separated list
 
 ```
 max-width
-Set max width for gird. `$max-width` will override `$width`.
+Set max width for gird. $max-width will override $width.
 Type:    number (50% | 1/2 | 600px | 40em)
 Default: null
 Length:  single value
