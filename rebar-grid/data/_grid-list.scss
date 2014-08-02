@@ -27,6 +27,12 @@ $grid-length: length($grid-keys);
       }
     }
 
+    @if map-has-key($grid-entry, container) and length(map-get($grid-entry, container)) == 1 and map-get($grid-entry, container) {
+      $sub-list: append($sub-list, true);
+    } @else {
+      $sub-list: append($sub-list, false);
+    }
+
     // # If this grid only has offset-left, offset-right, or both.
     @if not map-has-key($grid-entry, float) and not map-has-key($grid-entry, width) and not map-has-key($grid-entry, max-width) {
       $sub-list: append($sub-list, true);

@@ -3,7 +3,7 @@
 
 Rebar-Grid is an easy-to-use, flexible, and lightweight grid stystem. It is aimed to make responsive web development more efficient and keep CSS organised.
 
-Current version: 0.1.0
+Current version: 0.1.1
 
 Live demo on SassMeister: [http://sassmeister.com/gist/879b15f69ce08c3d126d](http://sassmeister.com/gist/879b15f69ce08c3d126d)
 
@@ -158,7 +158,7 @@ If set `$mobile-first: false`, the `$gutters` list need to be reversed.
 * The length of option value list should be *less or equal* to the length of `$gutters`, each value correspond to a responsive slice. Set a value to `false` will compile nothing to CSS at this responsive slice, and the last `false` values can be omitted.
 * `1/2` will be converted to `50%`.
 
-**nested**
+#### nested
 Set minus margin (gutter) for container, like the `.row` class of Bootstrap 3.
 ```
 Type:    boolean
@@ -166,7 +166,15 @@ Default: false
 Length:  single value
 ```
 
-**width**
+#### padding
+Set padding (gutter) for container.
+```
+Type: boolean
+Default: false
+Length: single value
+```
+
+#### width
 Set fixed width for container at each responsive slice.
 ```
 Type:    number (50% | 1/2 | 600px | 40em)
@@ -177,7 +185,7 @@ Length:  a space separated list
 
 ### Grid map options
 
-**float**
+#### float
 Set float direction for grid at each responsive slice.
 ```
 Type:    string (left | right | none)
@@ -185,7 +193,7 @@ Default: left
 Length:  a space separated list
 ```
 
-**offset-left**
+#### offset-left
 Set margin-left for grid at each responsive slice.
 ```
 Type:    number (10% | 1/12 | 100px | 5em)
@@ -193,7 +201,7 @@ Default: null
 Length:  a space separated list
 ```
 
-**offset-right**
+#### offset-right
 Set margin-right for grid at each responsive slice.
 ```
 Type:    number (10% | 1/12 | 100px | 5em)
@@ -201,7 +209,7 @@ Default: null
 Length:  a space separated list
 ```
 
-**width**
+#### width
 Set fluid width for grid at each responsive slice.
 ```
 Type:    number (50% | 1/2 | 600px | 40em)
@@ -209,13 +217,29 @@ Default: null
 Length:  a space separated list
 ```
 
-**max-width**
+#### max-width
 Set max width for gird. `$max-width` will override `$width`.
 ```
 Type:    number (50% | 1/2 | 600px | 40em)
 Default: null
 Length:  single value
 ```
+
+#### container
+Remove paddings for gird.
+```
+Type:    boolean
+Default: false
+Length:  single value
+```
+
+
+## Changelog
+
+### Version 0.1.1
+
+* Add `container` option of removing grid paddings
+
 
 
 ## Copyright & License

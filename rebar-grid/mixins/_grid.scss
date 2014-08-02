@@ -5,7 +5,7 @@
 
   // @debug $grid-list;
 
-  @each $selector, $float, $offset-left, $offset-right, $width, $max-width, $offset-only in $grid-list {
+  @each $selector, $float, $offset-left, $offset-right, $width, $max-width, $container, $offset-only in $grid-list {
 
     #{$selector} {
       @if $bk == 1 and not $offset-only {
@@ -30,7 +30,7 @@
       }
     }
 
-    @if not $offset-only {
+    @if not $container and not $offset-only {
       $selector-list: append($selector-list, unquote($selector), comma);
     }
   }
