@@ -2,10 +2,11 @@
 @mixin grid($bk) {
   $grid-list: grid-list($bk);
   $selector-list: ();
+  $gutter: nth($gutters, $bk)/2;
 
   // @debug $grid-list;
 
-  @each $selector, $float, $offset-left, $offset-right, $width, $max-width, $container, $offset-only in $grid-list {
+  @each $selector, $float, $offset-left, $offset-right, $gutter-left, $gutter-right, $width, $max-width, $container, $offset-only in $grid-list {
 
     #{$selector} {
       @if $bk == 1 and not $offset-only {
@@ -25,12 +26,26 @@
         margin-right: if(unitless($offset-right), percentage($offset-right), $offset-right);
       }
 
+      // not output padding if $container true
+      @if not $container {
+        @if $gutter-left and $gutter-right {
+          padding-left: if(unitless($gutter-left), percentage($gutter-left), $gutter-left);
+          padding-right: if(unitless($gutter-right), percentage($gutter-right), $gutter-right);
+        } @else if $gutter-left {
+          padding-left: if(unitless($gutter-left), percentage($gutter-left), $gutter-left);
+          padding-right: $gutter;
+        } @else if $gutter-right {
+          padding-left: $gutter;
+          padding-right: if(unitless($gutter-right), percentage($gutter-right), $gutter-right);
+        }
+      }
+
       @if $width {
         width: if(unitless($width), percentage($width), $width);
       }
     }
 
-    @if not $container and not $offset-only {
+    @if not $gutter-left and not $gutter-right and not $container and not $offset-only {
       $selector-list: append($selector-list, unquote($selector), comma);
     }
   }
@@ -38,7 +53,6 @@
   // # Output the selectors which have padding together.
   @if $container-padding-list != () or $selector-list != () {
     #{join($container-padding-list, $selector-list, comma)} {
-      $gutter: nth($gutters, $bk)/2;
       padding-left: $gutter;
       padding-right: $gutter;
     }

@@ -209,6 +209,22 @@ Default: null
 Length:  a space separated list
 ```
 
+#### gutter-left
+Reset the left gutter width for grid at each responsive slice.
+```
+Type:    number (10% | 1/12 | 100px | 5em)
+Default: null
+Length:  a space separated list
+```
+
+#### gutter-right
+Reset the right gutter width for grid at each responsive slice.
+```
+Type:    number (10% | 1/12 | 100px | 5em)
+Default: null
+Length:  a space separated list
+```
+
 #### width
 Set fluid width for grid at each responsive slice.
 ```
@@ -218,7 +234,7 @@ Length:  a space separated list
 ```
 
 #### max-width
-Set max width for gird. `$max-width` will override `$width`.
+Set max width for gird. `max-width` will override `width`.
 ```
 Type:    number (50% | 1/2 | 600px | 40em)
 Default: null
@@ -236,9 +252,13 @@ Length:  single value
 
 ## Changelog
 
-### Version 0.1.1
+### Version 0.1.2 (3 Aug 2014)
 
-* Add `container` option of removing grid paddings
+* Add 'gutter-left' and `gutter-right` options of reseting gutter width.
+
+### Version 0.1.1 (2 Aug 2014)
+
+* Add `container` option of removing grid paddings.
 
 
 

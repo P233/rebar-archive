@@ -7,8 +7,11 @@ $grid-length: length($grid-keys);
 // # $float -> float
 // # $offset-left -> margin-left
 // # $offset-right -> margin-right
+// # $gutter-left -> padding-left
+// # $gutter-right -> padding-right
 // # $width -> width
 // # $max-width -> max-width
+// # $container -> remove paddings
 // # $offset-only -> if this grid only has offset-left, offset-right, or both
 // # if no value given, the default value is 'false'
 @function grid-list($bk) {
@@ -19,7 +22,7 @@ $grid-length: length($grid-keys);
     $grid-entry: map-get($grid, $grid-key);
     $sub-list: $grid-key;
 
-    @each $key in (float, offset-left, offset-right, width, max-width) {
+    @each $key in (float, offset-left, offset-right, gutter-left, gutter-right, width, max-width) {
       @if map-has-key($grid-entry, $key) {
         $sub-list: append($sub-list, get-value($grid-entry, $key, $bk));
       } @else {
