@@ -28,6 +28,12 @@ $container-padding-list: ();
       $container-padding-list: append($container-padding-list, unquote($container-key), comma) !global;
     }
 
+    @if map-has-key($container-entry, max-width) and length(map-get($container-entry, max-width)) == 1 and map-get($container-entry, max-width) {
+      $sub-list: append($sub-list, get-value($container-entry, max-width, $bk));
+    } @else {
+      $sub-list: append($sub-list, false);
+    }
+
     @if map-has-key($container-entry, width) {
       $sub-list: append($sub-list, get-value($container-entry, width, $bk));
     } @else {

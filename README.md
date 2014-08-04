@@ -3,7 +3,7 @@
 
 Rebar-Grid is an easy-to-use, flexible, and lightweight grid stystem. It is aimed to make responsive web development more efficient and keep CSS organised.
 
-Current version: 0.1.1
+Current version: 0.1.3
 
 Live demo on SassMeister: [http://sassmeister.com/gist/879b15f69ce08c3d126d](http://sassmeister.com/gist/879b15f69ce08c3d126d)
 
@@ -174,6 +174,14 @@ Default: false
 Length: single value
 ```
 
+#### max-width
+Reset max width for container. This value will override the defaut `$max-width` and fixed width.
+```
+Type:    number (50% | 1/2 | 600px | 40em)
+Default: null
+Length:  single value
+```
+
 #### width
 Set fixed width for container at each responsive slice.
 ```
@@ -251,6 +259,10 @@ Length:  single value
 
 
 ## Changelog
+
+### Version 0.1.3 (4 Aug 2014)
+
+* Add `max-width` option of reseting container max width.
 
 ### Version 0.1.2 (3 Aug 2014)
 

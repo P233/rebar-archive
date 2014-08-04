@@ -19,6 +19,9 @@ $container: (
   ),
   ".full-width-container": (
     width: auto
+  ),
+  ".container-new-max-width": (
+    max-width: 960px
   )
 );
 
@@ -117,7 +120,7 @@ body {
   margin: 0;
 }
 
-.container, .fixed-width-container, .full-width-container {
+.container, .fixed-width-container, .full-width-container, .container-new-max-width {
   background: transparentize($red, .8);
   margin-bottom: 50px;
 }
