@@ -177,7 +177,7 @@ Length: single value
 #### max-width
 Reset max width for container. This value will override the defaut `$max-width` and fixed width.
 ```
-Type:    number (50% | 1/2 | 600px | 40em)
+Type:    number (50% | 600px | 40em)
 Default: null
 Length:  single value
 ```
@@ -185,7 +185,7 @@ Length:  single value
 #### width
 Set fixed width for container at each responsive slice.
 ```
-Type:    number (50% | 1/2 | 600px | 40em)
+Type:    number (50% | 600px | 40em)
 Default: null
 Length:  a space separated list
 ```
@@ -260,15 +260,15 @@ Length:  single value
 
 ## Changelog
 
-### Version 0.1.3 (4 Aug 2014)
+##### Version 0.1.3 (4 Aug 2014)
 
 * Add `max-width` option of reseting container max width.
 
-### Version 0.1.2 (3 Aug 2014)
+##### Version 0.1.2 (3 Aug 2014)
 
-* Add 'gutter-left' and `gutter-right` options of reseting gutter width.
+* Add `gutter-left` and `gutter-right` options of reseting gutter width.
 
-### Version 0.1.1 (2 Aug 2014)
+##### Version 0.1.1 (2 Aug 2014)
 
 * Add `container` option of removing grid paddings.
 
