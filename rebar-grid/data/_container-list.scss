@@ -7,8 +7,9 @@ $container-padding-list: ();
 
 // # The container-list() function will generate a list of
 // # $selector -> selector name
-// # $nested -> if this container is a wrap of nested girds
-// # $width -> if this contaienr has fixed width
+// # $nested -> enable minus margin-left and margin-right
+// # $width -> set fixed width
+// # $max-width -> reset $max-width
 // # if no value given, the default value is 'false'
 @function container-list($bk) {
   $container-list: ();
