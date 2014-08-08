@@ -6,5 +6,3 @@ $mobile-first: true !default;
 $breakpoints: if($mobile-first, 481px 769px 993px, 992px 768px 480px) !default;
 
 $gutters: if($mobile-first, 10px 16px 24px 30px, 30px 24px 16px 10px) !default;
-
-$media-feature: if($mobile-first, min-width, max-width);

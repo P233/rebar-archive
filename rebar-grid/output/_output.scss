@@ -1,5 +1,6 @@
 
 $loop-end: length($breakpoints) + 1;
+$media-feature: if($mobile-first, min-width, max-width);
 
 @for $i from 1 through $loop-end {
   @if $i == 1 {
