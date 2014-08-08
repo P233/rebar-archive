@@ -1,0 +1,4 @@
+
+@function fraction($value) {
+  @return if(unitless($value), percentage($value), $value);
+}

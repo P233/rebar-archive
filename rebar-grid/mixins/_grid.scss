@@ -13,35 +13,35 @@
         float: if($float, $float, left);
 
         @if $max-width {
-          max-width: if(unitless($max-width), percentage($max-width), $max-width);
+          max-width: fraction($max-width);
         }
       } @else if $float {
         float: $float;
       }
 
       @if $offset-left {
-        margin-left: if(unitless($offset-left), percentage($offset-left), $offset-left);
+        margin-left: fraction($offset-left);
       }
       @if $offset-right {
-        margin-right: if(unitless($offset-right), percentage($offset-right), $offset-right);
+        margin-right: fraction($offset-right);
       }
 
       // not output padding if $container true
       @if not $container {
         @if $gutter-left and $gutter-right {
-          padding-left: if(unitless($gutter-left), percentage($gutter-left), $gutter-left);
-          padding-right: if(unitless($gutter-right), percentage($gutter-right), $gutter-right);
+          padding-left: fraction($gutter-left);
+          padding-right: fraction($gutter-right);
         } @else if $gutter-left {
-          padding-left: if(unitless($gutter-left), percentage($gutter-left), $gutter-left);
+          padding-left: fraction($gutter-left);
           padding-right: $gutter;
         } @else if $gutter-right {
           padding-left: $gutter;
-          padding-right: if(unitless($gutter-right), percentage($gutter-right), $gutter-right);
+          padding-right: fraction($gutter-right);
         }
       }
 
       @if $width {
-        width: if(unitless($width), percentage($width), $width);
+        width: fraction($width);
       }
     }
 
