@@ -6,7 +6,7 @@
 
   // @debug $container-list;
 
-  @each $selector, $nested, $new-max-width, $width in $container-list {
+  @each $selector, $nested, $new-max-width, $fixed-width in $container-list {
     #{$selector} {
       @if $bk == 1 {
         @if $nested {
@@ -18,8 +18,8 @@
 
           @if $new-max-width {
             max-width: $new-max-width;
-          } @else if $width {
-            width: $width;
+          } @else if $fixed-width {
+            width: $fixed-width;
           } @else {
             max-width: $max-width;
           }
@@ -31,8 +31,8 @@
         @if $nested {
           margin-left: -$gutter;
           margin-right: -$gutter;
-        } @else if $width {
-          width: $width;
+        } @else if $fixed-width {
+          width: $fixed-width;
         }
       }
     }

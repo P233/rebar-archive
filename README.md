@@ -175,14 +175,14 @@ Length: single value
 ```
 
 #### max-width
-Reset max width for container. This value will override the defaut `$max-width` and fixed width.
+Reset max width for container. This value will override the defaut `$max-width` and `fixed-width`.
 ```
 Type:    number (50% | 600px | 40em)
 Default: null
 Length:  single value
 ```
 
-#### width
+#### fixed-width
 Set fixed width for container at each responsive slice.
 ```
 Type:    number (50% | 600px | 40em)

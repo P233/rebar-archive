@@ -35,8 +35,8 @@ $container-padding-list: ();
       $sub-list: append($sub-list, false);
     }
 
-    @if map-has-key($container-entry, width) {
-      $sub-list: append($sub-list, get-value($container-entry, width, $bk));
+    @if map-has-key($container-entry, fixed-width) {
+      $sub-list: append($sub-list, get-value($container-entry, fixed-width, $bk));
     } @else {
       $sub-list: append($sub-list, false);
     }
