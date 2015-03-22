@@ -1,0 +1,267 @@
+
+// Rebar Grid Framework v1.0.0
+// Copyright (c) 2015 Peiwen Lu
+// Released under the MIT License.
+
+
+//------- DEFAULT SETTINGS -------//
+
+$mobile-first ?= true
+$max-width    ?= 1170px
+$breakpoints  ?= $mobile-first ? 481px 769px 993px : 992px 768px 480px
+$gutters      ?= $mobile-first ? 20px 20px 26px 30px : 30px 26px 20px 20px
+
+// Collect containers which have gutters. These containers will be generated together with grid-gutter-list.
+$container-gutter-list = ()
+
+
+
+//------- FUNCITONS -------//
+
+// # CONVERT FRACTION TO PERCENTAGE
+to-percentage(n)
+  if type(n) == 'unit'
+    return unit(n) ? n : n * 100%
+  else
+    return n
+
+
+// # MEDIA FEATURE
+// Output media feature for `slicer()` mixin.
+media-feature(bk)
+  if $mobile-first
+    return bk > 0 ? min-width : max-width
+  else
+    return bk > 0 ? max-width : min-width
+
+
+// # QUERY BREAKPOINT WIDTH
+// Query breakpoint width for `slicer()` mixin.
+// If negative slice index, minus 1 (if $mobile-first: true) or plus 1 (if $mobile-first: false).
+query-breakpoint(bk)
+  if bk > 0
+    return $breakpoints[bk - 1]
+  else if bk < 0
+    return $breakpoints[abs(bk + 1)] + ($mobile-first ? - 1 : 1)
+
+
+// # QUERY CONTAINER SETTINGS
+// Generate a comma separated list contains several space separated lists.
+// Each sub-list represents a container and contains the settings of target slice.
+
+// * i0 ->  selector  -> selector name
+// * i1 ->  nested    -> enable minus margin
+// * i2 ->  max-width -> override default $max-width
+// * i3 ->  min-width -> min-width
+// * i4 ->  width     -> width
+query-container(bk)
+  list = ()
+
+  for i0 in $container
+    entry = $container[i0]
+
+    i0 = join('', split(' ', i0)) // Remove space between selectors.
+    i1 = entry.nested == true ? true : null
+    i2 = entry.max-width && length(entry.max-width) == 1 ? to-percentage(entry.max-width) : null
+    i3 = entry.min-width && length(entry.min-width) == 1 ? to-percentage(entry.min-width) : null
+    i4 = entry.width ? to-percentage(entry.width[bk]) : null
+
+    if entry.gutter == true
+      push($container-gutter-list, i0 + ', ')
+
+    entry = join(' ', i0 i1 i2 i3 i4)
+    push(list, entry)
+  // end for
+  return list
+
+
+// # QUERY GRID SETTINGS
+// Generate a comma separated list contains several space separated lists.
+// Each sub-list represents a grid and contains the settings of target slice.
+//
+// * i0 -> selector     -> selector name
+// * i1 -> float        -> float
+// * i2 -> offset-left  -> margin-left
+// * i3 -> offset-right -> margin-right
+// * i4 -> gutter-left  -> padding-left
+// * i5 -> gutter-right -> padding-right
+// * i6 -> max-width    -> max-width
+// * i7 -> width        -> width
+// * i8 -> container    -> disable padding
+// * i9 -> offset-only  -> only has margin, disable other settings
+query-grid(bk)
+  list = ()
+
+  for i0 in $grid
+    entry = $grid[i0]
+
+    i0 = join('', split(' ', i0)) // Remove space between selectors.
+    i1 = entry.float        ? entry.float[bk] : null
+    i2 = entry.offset-left  ? to-percentage(entry.offset-left[bk])  : null
+    i3 = entry.offset-right ? to-percentage(entry.offset-right[bk]) : null
+    i4 = entry.gutter-left  ? to-percentage(entry.gutter-left[bk])  : null
+    i5 = entry.gutter-right ? to-percentage(entry.gutter-right[bk]) : null
+    i6 = entry.max-width    ? to-percentage(entry.max-width[bk])    : null
+    i7 = entry.width        ? to-percentage(entry.width[bk])        : null
+    i8 = entry.container == true ? true : null
+    i9 = entry.float == null && entry.gutter-left == null && entry.gutter-right == null && entry.max-width == null && entry.width == null ? true : null
+
+    entry = join(' ', i0 i1 i2 i3 i4 i5 i6 i7 i8 i9)
+    push(list, entry)
+  // end for
+  return list
+
+
+
+//------- MIXINS -------//
+
+// # CONTAINER MIXIN
+// Generate containers code for target slice.
+container(bk)
+  container = query-container(bk)
+  gutter = to-percentage($gutters[bk]/2)
+  container-list = ()
+
+  for i in container
+    i = split(' ', i)
+
+    selector    = i[0]
+    nested      = i[1] == 'true'
+    max-width   = i[2] == 'null' ? false : unquote(i[2])
+    min-width   = i[3] == 'null' ? false : unquote(i[3])
+    width       = i[4] == 'null' ? false : unquote(i[4])
+
+    {selector}
+      // First slice
+      if !bk
+        if nested
+          margin-left: - gutter
+          margin-right: - gutter
+        else
+          margin-left: auto
+          margin-right: auto
+
+          if max-width
+            max-width: max-width
+          else
+            max-width: to-percentage($max-width)
+
+          if min-width
+            min-width: min-width
+
+          if width
+            width: width
+
+        push(container-list, selector)
+
+      // other slices
+      else
+        if nested
+          margin-left: - gutter
+          margin-right: - gutter
+        else if width
+          width: width
+  // end for
+
+  // Clearfix
+  if !bk
+    {join(', ', container-list)}
+      &:after
+        content: ""
+        display: table
+        clear: both
+
+
+// # GRID MIXIN
+// Generate grids code for target slice.
+grid(bk)
+  grid = query-grid(bk)
+  gutter = to-percentage($gutters[bk]/2)
+  grid-gutter-list = ()
+  full-width-list = ()
+
+  for i in grid
+    i = split(' ', i)
+
+    selector     = i[0]
+    float        = i[1] == 'null' ? false : unquote(i[1])
+    offset-left  = i[2] == 'null' ? false : unquote(i[2])
+    offset-right = i[3] == 'null' ? false : unquote(i[3])
+    gutter-left  = i[4] == 'null' ? false : unquote(i[4])
+    gutter-right = i[5] == 'null' ? false : unquote(i[5])
+    max-width    = i[6] == 'null' ? false : unquote(i[6])
+    width        = i[7] == 'null' ? false : unquote(i[7])
+    container    = i[8] == 'true'
+    offset-only  = i[9] == 'true'
+
+    {selector}
+      if !bk && !offset-only
+        // offset-only grid doesn't have float property.
+        float: float ? float : left
+        if max-width
+          max-width: max-width
+          width: 100%
+      else if float
+        float: float
+
+      if offset-left
+        margin-left: offset-left
+      if offset-right
+        margin-right: offset-right
+
+      // container grid doesn't have padding property.
+      if !container
+        if gutter-left && gutter-right
+          padding-left: gutter-left
+          padding-right: gutter-right
+        else if gutter-left
+          padding-left: gutter-left
+          padding-right: gutter
+        else if gutter-right
+          padding-left: gutter
+          padding-right: gutter-right
+        else if !offset-only
+          // Add grid which has default gutter to grid-gutter-list.
+          push(grid-gutter-list, selector + ', ')
+
+      // Add grid which has 100% width to full-width-list.
+      if width == '100%'
+        push(full-width-list, selector)
+      else if width
+        width: width
+  // end for
+
+
+  // Generate all grids and containers which have default gutter together.
+  if $container-gutter-list || grid-gutter-list
+    {join(', ', $container-gutter-list grid-gutter-list)}
+      padding-left: gutter
+      padding-right: gutter
+    // Clear container-gutter-list at each breakpoint.
+    $container-gutter-list = ()
+
+  // Generate full-width-list.
+  if full-width-list
+    {join(', ', full-width-list)}
+      width: 100%
+
+
+// # SLICER MIXIN
+slicer(bk...)
+  if length(bk) == 1
+    @media screen and ({media-feature(bk[0])}: query-breakpoint(bk[0]))
+      {block}
+  else if length(bk) == 2
+    @media screen and ({media-feature(bk[0])}: query-breakpoint(bk[0])) and ({media-feature(bk[1])}: query-breakpoint(bk[1]))
+      {block}
+
+
+//------- OUTPUT -------//
+
+container(0)
+grid(0)
+
+for bk in 1..length($breakpoints)
+  +slicer(bk)
+    container(bk)
+    grid(bk)

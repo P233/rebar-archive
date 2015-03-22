@@ -1,8 +1,0 @@
-
-@mixin slice($bk) {
-  $mf: if($mobile-first, if($bk > 0, min-width, max-width), if($bk > 0, max-width, min-width));
-
-  @media screen and ($mf: bk($bk)) {
-    @content;
-  }
-}

@@ -1,0 +1,345 @@
+
+// Rebar Grid Framework v1.0.0
+// Copyright (c) 2015 Peiwen Lu
+// Released under the MIT License.
+
+
+//------- DEFAULT SETTINGS -------//
+
+$mobile-first : true   !default;
+$max-width    : 1170px !default;
+$breakpoints  : if($mobile-first, 481px 769px 993px, 992px 768px 480px)     !default;
+$gutters      : if($mobile-first, 20px 20px 26px 30px, 30px 26px 20px 20px) !default;
+
+// Collect containers which have gutters. These containers will be generated together with $grid-gutter-list.
+$container-gutter-list: ();
+
+
+
+//------- FUNCITONS -------//
+
+// # CONVERT FRACTION TO PERCENTAGE
+@function to-percentage($n) {
+  @if $n {
+    @return if(unitless($n), percentage($n), $n);
+  } @else {
+    @return $n;
+  }
+}
+
+
+// # QUERY VALUE
+// Query value for target slice.
+// If there's no value, return `false` as default value.
+@function query-value($map, $key, $bk) {
+  $list: map-get($map, $key);
+  @return if(length($list) >= $bk, nth($list, $bk), false);
+}
+
+
+// # MEDIA FEATURE
+// Output media feature for `slicer()` mixin.
+@function media-feature($bk) {
+  @if $mobile-first {
+    @return if($bk > 0, min-width, max-width);
+  } @else {
+    @return if($bk > 0, max-width, min-width);
+  }
+}
+
+// # QUERY BREAKPOINT WIDTH
+// Query breakpoint width for `slicer()` mixin.
+// If negative slice index, minus 1 (if $mobile-first: true) or plus 1 (if $mobile-first: false).
+@function query-breakpoint($bk) {
+  @if $bk > 0 {
+    @return nth($breakpoints, $bk);
+  } @else if $bk < 0 {
+    @return nth($breakpoints, abs($bk)) + if($mobile-first, -1, 1);
+  }
+}
+
+
+// # QUERY CONTAINER SETTINGS
+// Generate a comma separated list contains several space separated lists.
+// Each sub-list represents a container and contains the settings of target slice.
+
+// * $selector      -> selector name
+// * $nested        -> enable minus margin
+// * $new-max-width -> override default $max-width
+// * $min-width     -> min-width
+// * $width         -> width
+@function query-container($bk) {
+  $list: ();
+
+  @for $i from 1 through length($container) {
+    $selector: nth(map-keys($container), $i);
+    $nested: false;
+    $new-max-width: false;
+    $min-width: false;
+    $width: false;
+
+    $entry: map-get($container, $selector);
+
+    @if map-get($entry, nested) == true {
+      $nested: true;
+    }
+
+    // Only query max-width and min-width at the first slice.
+    @if $bk == 1 {
+      $new-max-width-value: map-get($entry, max-width);
+      @if $new-max-width-value and length($new-max-width-value) == 1 {
+        $new-max-width: to-percentage($new-max-width-value);
+      }
+
+      $min-width-value: map-get($entry, min-width);
+      @if $min-width-value and length($min-width-value) == 1 {
+        $min-width: to-percentage($min-width-value);
+      }
+    }
+
+    @if map-has-key($entry, width) {
+      $width: to-percentage(query-value($entry, width, $bk));
+    }
+
+    // If container has gutter, add its selector to $container-gutter-list.
+    @if map-get($entry, gutter) == true {
+      $container-gutter-list: append($container-gutter-list, $selector, comma) !global;
+    }
+
+    $value: join($selector, $nested $new-max-width $min-width $width);
+    $list: append($list, $value, comma);
+  }
+
+  @return $list;
+}
+
+
+// # QUERY GRID SETTINGS
+// Generate a comma separated list contains several space separated lists.
+// Each sub-list represents a grid and contains the settings of target slice.
+//
+// * $selector     -> selector name
+// * $float        -> float
+// * $offset-left  -> margin-left
+// * $offset-right -> margin-right
+// * $gutter-left  -> padding-left
+// * $gutter-right -> padding-right
+// * $max-width    -> max-width
+// * $width        -> width
+// * $container    -> disable padding
+// * $offset-only  -> only has margin, disable other settings
+@function query-grid($bk) {
+  $list: ();
+
+  @for $i from 1 through length($grid) {
+    $selector: nth(map-keys($grid), $i);
+    $entry: map-get($grid, $selector);
+    $value: $selector;
+
+    @if map-has-key($entry, float) {
+      $value: append($value, query-value($entry, float, $bk));
+    } @else {
+      $value: append($value, false);
+    }
+
+    @each $key in (offset-left, offset-right, gutter-left, gutter-right, max-width, width) {
+      @if map-has-key($entry, $key) {
+        $value: append($value, to-percentage(query-value($entry, $key, $bk)));
+      } @else {
+        $value: append($value, false);
+      }
+    }
+
+    @if map-get($entry, container) == true {
+      $value: append($value, true);
+    } @else {
+      $value: append($value, false);
+    }
+
+    // If grid only has offset settings, set $offset-only `true`.
+    @if ( (length($entry) == 1) and (map-has-key($entry, offset-left) or  (map-has-key($entry, offset-right))) )
+     or ( (length($entry) == 2) and (map-has-key($entry, offset-left) and (map-has-key($entry, offset-right))) ) {
+       $value: append($value, true);
+     } @else {
+       $value: append($value, false);
+     }
+
+    $list: append($list, $value, comma);
+  }
+
+  @return $list;
+}
+
+
+
+//------- MIXINS -------//
+
+// # CONTAINER MIXIN
+// Generate containers code for target slice.
+@mixin container($bk) {
+  $container: query-container($bk);
+  $gutter: to-percentage(nth($gutters, $bk)/2);
+  $container-list: ();
+
+  // @debug $container;
+
+  @each $selector, $nested, $new-max-width, $min-width, $width in $container {
+    #{$selector} {
+      @if $bk == 1 {
+        @if $nested {
+          margin-left: - $gutter;
+          margin-right: - $gutter;
+        } @else {
+          margin-left: auto;
+          margin-right: auto;
+
+          @if $new-max-width {
+            max-width: $new-max-width;
+          } @else {
+            max-width: to-percentage($max-width);
+          }
+
+          @if $min-width {
+            min-width: $min-width;
+          }
+
+          @if $width {
+            width: $width;
+          }
+        }
+
+        $container-list: append($container-list, $selector, comma);
+
+      } @else {
+        @if $nested {
+          margin-left: - $gutter;
+          margin-right: - $gutter;
+        } @else if $width {
+          width: $width;
+        }
+      }
+    }
+  }
+
+  // Clearfix
+  @if $bk == 1 {
+    #{$container-list} {
+      &:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+    }
+  }
+
+}
+
+
+// # GRID MIXIN
+// Generate grids code for target slice.
+@mixin grid($bk) {
+  $grid: query-grid($bk);
+  $gutter: to-percentage(nth($gutters, $bk)/2);
+  $grid-gutter-list: ();
+  $full-width-list: ();
+
+  // @debug $grid;
+
+  @each $selector, $float, $offset-left, $offset-right, $gutter-left, $gutter-right, $grid-max-width, $width, $container, $offset-only in $grid {
+
+    #{$selector} {
+      // $offset-only grid doesn't have float property.
+      @if $bk == 1 and not $offset-only {
+        float: if($float, $float, left);
+
+        @if $grid-max-width {
+          max-width: $grid-max-width;
+          width: 100%;
+        }
+      } @else if $float {
+        float: $float;
+      }
+
+      @if $offset-left {
+        margin-left: $offset-left;
+      }
+      @if $offset-right {
+        margin-right: $offset-right;
+      }
+
+      // $container grid doesn't have padding property.
+      @if not $container {
+        @if $gutter-left and $gutter-right {
+          padding-left: $gutter-left;
+          padding-right: $gutter-right;
+        } @else if $gutter-left {
+          padding-left: $gutter-left;
+          padding-right: $gutter;
+        } @else if $gutter-right {
+          padding-left: $gutter;
+          padding-right: $gutter-right;
+        } @else if not $offset-only {
+          // Add grid which has default gutter to $grid-gutter-list.
+          $grid-gutter-list: append($grid-gutter-list, $selector, comma);
+        }
+      }
+
+      // Add grid which has 100% width to $full-width-list.
+      @if $width and $width == 100% {
+        $full-width-list: append($full-width-list, $selector, comma);
+      } @else if $width {
+        width: $width;
+      }
+    }
+  }
+
+  // Generate all grids and containers which have default gutter together.
+  @if $container-gutter-list != () or $grid-gutter-list != () {
+    #{join($container-gutter-list, $grid-gutter-list, comma)} {
+      padding-left: $gutter;
+      padding-right: $gutter;
+    }
+    // Clear $container-gutter-list at each breakpoint.
+    $container-gutter-list: () !global;
+  }
+
+  // Generate $full-width-list.
+  @if $full-width-list != () {
+    #{$full-width-list} {
+      width: 100%;
+    }
+  }
+}
+
+
+// # SLICER MIXIN
+@mixin slicer($bk...) {
+  @if length($bk) == 1 {
+    $a: nth($bk, 1);
+    @media screen and (media-feature($a): query-breakpoint($a)) {
+      @content;
+    }
+  } @else if length($bk) == 2 {
+    $a: nth($bk, 1);
+    $b: nth($bk, 2);
+    @media screen and (media-feature($a): query-breakpoint($a))
+                  and (media-feature($b): query-breakpoint($b)) {
+      @content;
+    }
+  }
+}
+
+
+//------- OUTPUT -------//
+
+@include container(1);
+@include grid(1);
+
+@for $bk from 1 through length($breakpoints) {
+  // $breakpoints length is 1 shorter than $gutters. Add 1 for querying value.
+  // Do not add 1 for `slicer()` mixin so keep responsive slice index start from 0.
+  @include slicer($bk) {
+    @include container($bk + 1);
+    @include grid($bk + 1);
+  }
+}
