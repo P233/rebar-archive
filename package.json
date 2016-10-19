@@ -1,0 +1,18 @@
+{
+  "name": "rebar.scss",
+  "version": "2.0.0",
+  "description": "",
+  "scripts": {
+    "sassdoc": "sassdoc ./_rebar.scss"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/P233/Rebar.git"
+  },
+  "author": "Peiwen Lu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/P233/Rebar/issues"
+  },
+  "homepage": "https://github.com/P233/Rebar#readme"
+}

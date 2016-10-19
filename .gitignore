@@ -1,3 +1,2 @@
-.sass-cache
-*.map
-*.css
+/node_modules
+/sassdoc

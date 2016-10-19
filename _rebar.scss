@@ -1,0 +1,320 @@
+/*---------------------------------*\
+| Rebar Grid Framework v2.0.0       |
+| Copyright (c) 2015-2016 Peiwen Lu |
+| Released under the MIT License    |
+\*---------------------------------*/
+
+
+//------- DEFAULT VARIABLES -------//
+
+$rebar-mobile-first    : true   !default;
+
+$rebar-max-width       : 1170px !default;
+$rebar-breakpoints     : if($rebar-mobile-first, 481px 769px 993px,     992px 768px 480px)     !default;
+$rebar-gutters         : if($rebar-mobile-first, 20px  null  26px 30px, 30px  26px  20px null) !default;
+
+$rebar-min-pixel-ratio : 2      !default;
+$rebar-min-resolution  : 192dpi !default;
+
+$rebar-enable-diagram  : false  !default;
+
+
+
+//------- FUNCTION HELPERS -------//
+
+/// Convert fraction or unitless value to percent value, return other value itself.
+/// @access private
+/// @group helpers
+/// @parameter {Number | Null} $value - The width value of containers or grids settings
+/// @return {Number | Null}
+@function _rebar-percentage($value) {
+  @if type-of($value) == number {
+    @return if(unitless($value), percentage($value), $value);
+  } @else {
+    @return $value;
+  }
+}
+
+
+/// Query value from `$list` based on `$slice`, if no match return `null`.
+/// @access private
+/// @group helpers
+/// @parameter {List} $list - Value list of containers or grids settings
+/// @parameter {Number} $slice - Responsive slice
+/// @return {*} Return matched value
+@function _rebar-get-value-from-list($list, $slice) {
+  @return if(length($list) >= $slice, nth($list, $slice), null);
+}
+
+
+/// Query value from `$map` based on `$key` and `$slice`, if no match return `null`.
+/// @access private
+/// @group helpers
+/// @parameter {Map} $map - Properties map of containers or grids settings
+/// @parameter {String} $key - Property key
+/// @parameter {Number} $slice - Responsive slice
+/// @return {*} Return matched value
+@function _rebar-get-value-from-map($map, $key, $slice) {
+  $list: map-get($map, $key);
+
+  @return _rebar-get-value-from-list($list, $slice);
+}
+
+
+/// Query media feature based on `$slice` and `$rebar-mobile-first`.
+/// @access private
+/// @group helpers
+/// @parameter {Number} $slice - Responsive slice
+/// @return {String} Media feature string
+@function _rebar-get-media-feature($slice) {
+  @if $rebar-mobile-first {
+    @return if($slice > 0, min-width, max-width);
+  } @else {
+    @return if($slice > 0, max-width, min-width);
+  }
+}
+
+
+/// Query breakpoint based on `$slice`, `$rebar-mobile-first`, and `$rebar-breakpoints`.
+/// @access private
+/// @group helpers
+/// @parameter {Number} $slice - Responsive slice
+/// @return {Numebr} Breakpoint numebr
+@function _rebar-get-breakpoint($slice) {
+  @if $slice > 0 {
+    @return nth($rebar-breakpoints, $slice);
+  } @else {
+    @return nth($rebar-breakpoints, abs($slice)) + if($rebar-mobile-first, -1, 1);
+  }
+}
+
+
+/// List settings that only for queried responsive slice.
+/// @access private
+/// @group helpers
+/// @parameter {Map} $map - Properties map of containers or grids settings
+/// @parameter {List} $keys - Property keys
+/// @parameter {Number} $slice - Responsive slice
+/// @return {List} 
+@function _rebar-parse-settings($map, $keys, $slice) {
+  $result: ();
+  $selectors: map-keys($map);
+
+  @for $i from 1 through length($selectors) {
+    $selector: nth($selectors, $i);
+    $submap: map-get($map, $selector);
+    $subset: $selector;
+    $result: append($result, $subset, comma);
+
+    @each $key in $keys {
+      $subset: append($subset, _rebar-percentage(_rebar-get-value-from-map($submap, $key, $slice)));
+    }
+  }
+  @return $result;
+}
+
+
+
+//------- MIXIN HELPERS -------//
+
+/// Generate containers styles for queried responsive slice.
+/// @access private
+/// @group helpers
+/// @parameter {Map} $map - Containers settings
+/// @parameter {Number} $slice - Responsive slice
+/// @output Containers styles
+@mixin _rebar-generate-containers($map, $slice) {
+  $keys: nested, max-width, min-width, width, gutter;
+  $containers: _rebar-parse-settings($map, $keys, $slice);
+  $gutter-width: _rebar-percentage(_rebar-get-value-from-list($rebar-gutters, $slice));
+  $gutter-width: if(type-of($gutter-width) == number, $gutter-width / 2, $gutter-width);
+
+  @each $selector, $nested, $max-width, $min-width, $width, $gutter in $containers {
+    #{$selector} {
+      width: $width;
+      min-width: $min-width;
+      max-width: $max-width;
+
+      @if $slice == 1 {
+        @if $nested {
+          margin-right: -$gutter-width;
+          margin-left: -$gutter-width;
+        } @else {
+          margin-right: auto;
+          margin-left: auto;
+        }
+      }
+      @if $gutter {
+        padding-right: $gutter-width;
+        padding-left: $gutter-width;
+      }
+    }
+  }
+}
+
+
+/// Generate grids styles for queried responsive slice.
+/// @access private
+/// @group helpers
+/// @parameter {Map} $map - Grids settings
+/// @parameter {Number} $slice - Responsive slice
+/// @output Grids styles
+@mixin _rebar-generate-grids($map, $slice) {
+  $keys: float, width, max-width, offset-right, offset-left, gutter-right, gutter-left, container;
+  $grids: _rebar-parse-settings($map, $keys, $slice);
+  $gutter-width: _rebar-percentage(_rebar-get-value-from-list($rebar-gutters, $slice));
+  $gutter-width: if(type-of($gutter-width) == number, $gutter-width / 2, $gutter-width);
+  $default-gutter-grids: ();
+
+  @each $selector, $float, $width, $max-width, $offset-right, $offset-left, $gutter-right, $gutter-left, $container in $grids {
+    #{$selector} {
+      width: $width;
+      max-width: $max-width;
+      margin-right: $offset-right;
+      margin-left: $offset-left;
+
+      @if $slice == 1 {
+        float: if($float, $float, left);
+      } @else {
+        float: $float;
+      }
+      @if not $container {
+        @if $gutter-right or $gutter-left {
+          padding-right: if($gutter-right, $gutter-right, $gutter-width);
+          padding-left: if($gutter-left, $gutter-left, $gutter-width);
+        } @else {
+          $default-gutter-grids: append($default-gutter-grids, $selector, comma);
+        }
+      }
+    }
+  }
+
+  #{$default-gutter-grids} {
+    padding-right: $gutter-width;
+    padding-left: $gutter-width;
+  }
+}
+
+
+/// Generate clearfix styles for passed-in selectors list.
+/// @access private
+/// @group helpers
+/// @parameter {List} $selectors - All containers selector
+/// @output Clearfix styles
+@mixin _rebar-clearfix($selectors) {
+  #{$selectors} {
+    &::after {
+      display: table;
+      clear: both;
+      content: '';
+    }
+  }
+}
+
+
+
+//------- PUBLIC MIXINS -------//
+
+/// Generate @media query for retina screen.
+/// @access public
+/// @group rebar
+/// @output @media query
+@mixin retina {
+  @media (-webkit-min-device-pixel-ratio: $rebar-min-pixel-ratio),
+         (min-resolution: $rebar-min-resolution) {
+    @content;
+  }
+}
+
+
+/// Generate @media query for queried responsive slices.
+/// @access public
+/// @group rebar
+/// @parameter {Number} $slice1 - Responsive slice
+/// @parameter {Number | Null} $slice2 [Null] - Responsive slice
+/// @output @media query
+@mixin slicer($slice1, $slice2: null) {
+  @if $slice1 == 0 {
+    @content;
+  } @else if $slice2 {
+    @media screen and (_rebar-get-media-feature($slice1): _rebar-get-breakpoint($slice1))
+                  and (_rebar-get-media-feature($slice2): _rebar-get-breakpoint($slice2)) {
+      @content;
+    }
+  } @else {
+    @media screen and (_rebar-get-media-feature($slice1): _rebar-get-breakpoint($slice1)) {
+      @content;
+    }
+  }
+}
+
+
+/// Generate containers styles in all responsive slices.
+/// @access public
+/// @group rebar
+/// @parameter {Map} $containers - Containers settings
+/// @output Containers styles
+@mixin containers($containers) {
+  @include _rebar-clearfix(map-keys($containers));
+
+  @for $i from 0 through length($rebar-breakpoints) {
+    @include slicer($i) {
+      @include _rebar-generate-containers($containers, $i + 1);
+    }
+  }
+}
+
+
+/// Generate grids styles in all responsive slices.
+/// @access public
+/// @group rebar
+/// @parameter {Map} $grids - Grids settings
+/// @output Grids styles
+@mixin grids($grids) {
+  @for $i from 0 through length($rebar-breakpoints) {
+    @include slicer($i) {
+      @include _rebar-generate-grids($grids, $i + 1);
+    }
+  }
+}
+
+
+/// Generate containers and grids styles in all responsive slices.
+/// @access public
+/// @group rebar
+/// @parameter {Map} $containers - Containers settings
+/// @parameter {Map} $grids - Grids settings
+/// @output Containers and Grids styles
+@mixin rebar($containers, $grids) {
+  @include _rebar-clearfix(map-keys($containers));
+
+  @for $i from 0 through length($rebar-breakpoints) {
+    @include slicer($i) {
+      @include _rebar-generate-containers($containers, $i + 1);
+      @include _rebar-generate-grids($grids, $i + 1);
+    }
+  }
+}
+
+
+/// Generate styles based on properties map in all responsive slices.
+/// @access public
+/// @group rebar
+/// @parameter {Map} $map - Properties map
+/// @output Styles based on properties map
+@mixin properties($map) {
+  @for $i from 0 through length($rebar-breakpoints) {
+    @include slicer($i) {
+      @each $property in map-keys($map) {
+        #{$property}: _rebar-get-value-from-map($map, $property, $i + 1);
+      }
+    }
+  }
+}
+
+
+
+//------- BREAKPOINTS DIAGRAM -------//
+
+
+@if $rebar-enable-diagram {}
