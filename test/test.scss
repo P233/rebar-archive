@@ -1,0 +1,127 @@
+@import "true";
+@import "../rebar.scss";
+
+@include test-module('Function Helpers Test') {
+  @include test('_rebar-percentage') {
+    $test:   _rebar-percentage(1/2);
+    $expect: 50%;
+    @include assert-equal($test, $expect, "Convert fraction to percent value.");
+
+    $test:   _rebar-percentage(1);
+    $expect: 100%;
+    @include assert-equal($test, $expect, "Convert unitless number to percent value.");
+
+    $test:   _rebar-percentage(20px);
+    $expect: 20px;
+    @include assert-equal($test, $expect, "Don't convert number has unit.");
+
+    $test:   _rebar-percentage(null);
+    $expect: null;
+    @include assert-equal($test, $expect, "Don't convert other values.");
+  }
+
+
+  @include test('_rebar-get-value-from-list') {
+    $list: 1/2 null 100%;
+
+    $test: _rebar-get-value-from-list($list, 1);
+    $expect: 1/2;
+    @include assert-equal($test, $expect, "Slice is less than $list length.");
+
+    $test: _rebar-get-value-from-list($list, 4);
+    $expect: null;
+    @include assert-equal($test, $expect, "Slice is larger than $list length.");
+  }
+
+
+  @include test('_rebar-get-value-from-map') {
+    $map: (
+      width: 1/2 null 100%
+    );
+
+    $test: _rebar-get-value-from-map($map, width, 1);
+    $expect: 1/2;
+    @include assert-equal($test, $expect, "Slice is less than queried list length.");
+
+    $test: _rebar-get-value-from-map($map, width, 4);
+    $expect: null;
+    @include assert-equal($test, $expect, "Slice is larger than queried length.");
+  }
+
+
+  @include test('_rebar-get-media-feature') {
+    $rebar-mobile-first: true !global;
+
+    $test: _rebar-get-media-feature(2);
+    $expect: min-width;
+    @include assert-equal($test, $expect);
+
+    $test: _rebar-get-media-feature(-2);
+    $expect: max-width;
+    @include assert-equal($test, $expect);
+
+    $rebar-mobile-first: false !global;
+
+    $test: _rebar-get-media-feature(2);
+    $expect: max-width;
+    @include assert-equal($test, $expect);
+
+    $test: _rebar-get-media-feature(-2);
+    $expect: min-width;
+    @include assert-equal($test, $expect);
+  }
+
+
+  @include test('_rebar-get-breakpoint') {
+    $rebar-breakpoints: 1000px 500px 250px !global;
+
+    $rebar-mobile-first: true !global;
+
+    $test: _rebar-get-breakpoint(2);
+    $expect: 500px;
+    @include assert-equal($test, $expect);
+
+    $test: _rebar-get-breakpoint(-2);
+    $expect: 499px;
+    @include assert-equal($test, $expect);
+
+    $rebar-mobile-first: false !global;
+
+    $test: _rebar-get-breakpoint(2);
+    $expect: 500px;
+    @include assert-equal($test, $expect);
+
+    $test: _rebar-get-breakpoint(-2);
+    $expect: 501px;
+    @include assert-equal($test, $expect);
+  }
+
+
+  @include test('_rebar-parse-settings') {
+    $grids: (
+      ".grid-a": (
+        width: 1/2 null 100%,
+        float: left null "right" none,
+        container: true
+      ),
+      ".grid-b": (
+        width: 200px 50% fit-content,
+        float: none null right left,
+        container: false
+      )
+    );
+    $keys: width float container;
+
+    $test: _rebar-parse-settings($grids, $keys, 1);
+    $expect: ".grid-a" 50% left true, ".grid-b" 200px none  false;
+    @include assert-equal($test, $expect);
+
+    $test: _rebar-parse-settings($grids, $keys, 3);
+    $expect: ".grid-a" 100% "right" null, ".grid-b" fit-content right null;
+    @include assert-equal($test, $expect);
+
+    $test: _rebar-parse-settings($grids, $keys, 4);
+    $expect: ".grid-a" null none null, ".grid-b" null left null;
+    @include assert-equal($test, $expect);
+  }
+}

@@ -90,12 +90,13 @@ $rebar-enable-diagram  : false  !default;
 
 
 /// List settings that only for queried responsive slice.
+/// Fraction or unitless value will be converted in this function by calling `_rebar-percentage`.
 /// @access private
 /// @group helpers
 /// @parameter {Map} $map - Properties map of containers or grids settings
 /// @parameter {List} $keys - Property keys
 /// @parameter {Number} $slice - Responsive slice
-/// @return {List} 
+/// @return {List}
 @function _rebar-parse-settings($map, $keys, $slice) {
   $result: ();
   $selectors: map-keys($map);
@@ -104,11 +105,12 @@ $rebar-enable-diagram  : false  !default;
     $selector: nth($selectors, $i);
     $submap: map-get($map, $selector);
     $subset: $selector;
-    $result: append($result, $subset, comma);
 
     @each $key in $keys {
       $subset: append($subset, _rebar-percentage(_rebar-get-value-from-map($submap, $key, $slice)));
     }
+
+    $result: append($result, $subset, comma);
   }
   @return $result;
 }
