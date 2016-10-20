@@ -145,3 +145,106 @@
     }
   }
 }
+
+
+@include test-module('Rebar Mixins Test') {
+  @include test('retina') {
+    @include assert('Output media query for retina screen') {
+      @include output {
+        @include retina {
+          body { background-image: url(""); }
+        };
+      }
+      @include expect {
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+          body { background-image: url(""); }
+        }
+      }
+    }
+  }
+
+  @include test('slicer') {
+    $rebar-mobile-first: true !global;
+    $rebar-breakpoints: 481px 769px 993px !global;
+
+    @include assert('Output media query for positive slice') {
+      @include output {
+        @include slicer(2) {
+          body { margin: 0; }
+        };
+      }
+      @include expect {
+        @media screen and (min-width: 769px) {
+          body { margin: 0; }
+        }
+      }
+    }
+
+    @include assert('Output media query for nagitave slice') {
+      @include output {
+        @include slicer(-3) {
+          body { margin: 0; }
+        };
+      }
+      @include expect {
+        @media screen and (max-width: 992px) {
+          body { margin: 0; }
+        }
+      }
+    }
+
+    @include assert('Output media query for two slices') {
+      @include output {
+        @include slicer(2, -3) {
+          body { margin: 0; }
+        };
+      }
+      @include expect {
+        @media screen and (min-width: 769px) and (max-width: 992px) {
+          body { margin: 0; }
+        }
+      }
+    }
+  }
+
+  @include test('properties') {
+    $rebar-mobile-first: false !global;
+    $rebar-breakpoints: 992px 768px 480px !global;
+
+    @include assert('Output properties for all slices') {
+      @include output {
+        $properties: (
+          "font-size": 18px 16px 14px,
+          "line-height": 1.5 1.3 1.2 1
+        );
+
+        body {
+          @include properties($properties);
+        }
+      }
+      @include expect {
+        body {
+          font-size: 18px;
+          line-height: 1.5;
+        }
+        @media screen and (max-width: 992px) {
+          body {
+            font-size: 16px;
+            line-height: 1.3;
+          }
+        }
+        @media screen and (max-width: 768px) {
+          body {
+            font-size: 14px;
+            line-height: 1.2;
+          }
+        }
+        @media screen and (max-width: 480px) {
+          body {
+            line-height: 1;
+          }
+        }
+      }
+    }
+  }
+}
