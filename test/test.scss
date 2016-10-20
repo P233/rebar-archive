@@ -1,27 +1,27 @@
 @import "true";
 @import "../rebar.scss";
 
-@include test-module('Function Helpers Test') {
-  @include test('_rebar-percentage') {
-    $test:   _rebar-percentage(1/2);
+@include test-module("Function Helpers Test") {
+  @include test("_rebar-percentage") {
+    $test: _rebar-percentage(1/2);
     $expect: 50%;
     @include assert-equal($test, $expect, "Convert fraction to percent value.");
 
-    $test:   _rebar-percentage(1);
+    $test: _rebar-percentage(1);
     $expect: 100%;
     @include assert-equal($test, $expect, "Convert unitless number to percent value.");
 
-    $test:   _rebar-percentage(20px);
+    $test: _rebar-percentage(20px);
     $expect: 20px;
     @include assert-equal($test, $expect, "Don't convert number has unit.");
 
-    $test:   _rebar-percentage(null);
+    $test: _rebar-percentage(null);
     $expect: null;
     @include assert-equal($test, $expect, "Don't convert other values.");
   }
 
 
-  @include test('_rebar-get-value-from-list') {
+  @include test("_rebar-get-value-from-list") {
     $list: 1/2 null 100%;
 
     $test: _rebar-get-value-from-list($list, 1);
@@ -34,7 +34,7 @@
   }
 
 
-  @include test('_rebar-get-value-from-map') {
+  @include test("_rebar-get-value-from-map") {
     $map: (
       width: 1/2 null 100%
     );
@@ -49,7 +49,7 @@
   }
 
 
-  @include test('_rebar-get-media-feature') {
+  @include test("_rebar-get-media-feature") {
     $rebar-mobile-first: true !global;
 
     $test: _rebar-get-media-feature(2);
@@ -72,7 +72,7 @@
   }
 
 
-  @include test('_rebar-get-breakpoint') {
+  @include test("_rebar-get-breakpoint") {
     $rebar-breakpoints: 1000px 500px 250px !global;
 
     $rebar-mobile-first: true !global;
@@ -97,7 +97,7 @@
   }
 
 
-  @include test('_rebar-parse-settings') {
+  @include test("_rebar-parse-settings") {
     $grids: (
       ".grid-a": (
         width: 1/2 null 100%,
@@ -113,7 +113,7 @@
     $keys: width float container;
 
     $test: _rebar-parse-settings($grids, $keys, 1);
-    $expect: ".grid-a" 50% left true, ".grid-b" 200px none  false;
+    $expect: ".grid-a" 50% left true, ".grid-b" 200px none false;
     @include assert-equal($test, $expect);
 
     $test: _rebar-parse-settings($grids, $keys, 3);
@@ -127,9 +127,9 @@
 }
 
 
-@include test-module('Mixin Helpers Test') {
-  @include test('_rebar-clearfix') {
-    @include assert('Output clearfix styles for a selectors list.') {
+@include test-module("Mixin Helpers Test") {
+  @include test("_rebar-clearfix") {
+    @include assert("Output clearfix styles for a selectors list.") {
       @include output {
         $selectors: ".container-a", ".container-b";
         @include _rebar-clearfix($selectors);
@@ -139,7 +139,7 @@
         .container-b::after {
           display: table;
           clear: both;
-          content: '';
+          content: "";
         }
       }
     }
@@ -147,9 +147,9 @@
 }
 
 
-@include test-module('Rebar Mixins Test') {
-  @include test('retina') {
-    @include assert('Output media query for retina screen') {
+@include test-module("Rebar Mixins Test") {
+  @include test("retina") {
+    @include assert("Output media query for retina screen") {
       @include output {
         @include retina {
           body { background-image: url(""); }
@@ -163,11 +163,11 @@
     }
   }
 
-  @include test('slicer') {
+  @include test("slicer") {
     $rebar-mobile-first: true !global;
     $rebar-breakpoints: 481px 769px 993px !global;
 
-    @include assert('Output media query for positive slice') {
+    @include assert("Output media query for positive slice") {
       @include output {
         @include slicer(2) {
           body { margin: 0; }
@@ -180,7 +180,7 @@
       }
     }
 
-    @include assert('Output media query for nagitave slice') {
+    @include assert("Output media query for nagitave slice") {
       @include output {
         @include slicer(-3) {
           body { margin: 0; }
@@ -193,7 +193,7 @@
       }
     }
 
-    @include assert('Output media query for two slices') {
+    @include assert("Output media query for two slices") {
       @include output {
         @include slicer(2, -3) {
           body { margin: 0; }
@@ -207,11 +207,11 @@
     }
   }
 
-  @include test('properties') {
+  @include test("properties") {
     $rebar-mobile-first: false !global;
     $rebar-breakpoints: 992px 768px 480px !global;
 
-    @include assert('Output properties for all slices') {
+    @include assert("Output properties for all slices") {
       @include output {
         $properties: (
           "font-size": 18px 16px 14px,
