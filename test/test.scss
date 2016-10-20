@@ -125,3 +125,23 @@
     @include assert-equal($test, $expect);
   }
 }
+
+
+@include test-module('Mixin Helpers Test') {
+  @include test('_rebar-clearfix') {
+    @include assert('Output clearfix styles for a selectors list.') {
+      @include output {
+        $selectors: ".container-a", ".container-b";
+        @include _rebar-clearfix($selectors);
+      }
+      @include expect {
+        .container-a::after,
+        .container-b::after {
+          display: table;
+          clear: both;
+          content: '';
+        }
+      }
+    }
+  }
+}
